@@ -1,0 +1,368 @@
+{% extends "layout.html" %}
+
+{% block title %}Login - OSOF{% endblock %}
+
+{% block container_class %}login-container{% endblock %}
+
+{% block content %}
+<section id="login-form">
+    <header>
+        <h1><i class="fas fa-cube"></i> OSOF</h1>
+        <p class="subtitle">광덕고등학교 동아리</p>
+    </header>
+    
+    <form>
+        <div class="input-group">
+            <label for="username"><i class="fas fa-user"></i> 아이디</label>
+            <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" autocomplete="username">
+        </div>
+        <div class="input-group">
+            <label for="password"><i class="fas fa-lock"></i> 비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+        </div>
+        <div class="remember-me-container">
+            <label class="remember-me-label">
+                <input type="checkbox" id="remember-me" name="remember-me">
+                <span class="checkmark"></span>
+                <span class="remember-text">로그인 상태를 유지하시겠습니까?</span>
+            </label>
+        </div>
+        <button id="login-button" type="button"><i class="fas fa-sign-in-alt"></i> 로그인</button>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="success-message" class="success-message" style="display: none;"></div>
+    </form>
+    
+    <footer class="toggle-form">
+        <p>계정이 없으신가요? <a href="#" id="show-register">회원가입</a></p>
+    </footer>
+</section>
+
+<section id="register-form" style="display: none;">
+    <header>
+        <h1><i class="fas fa-user-plus"></i> 회원가입</h1>
+        <p class="subtitle">새로운 계정을 만들어보세요</p>
+    </header>
+    
+    <form>
+        <div class="input-group">
+            <label for="reg-username"><i class="fas fa-user"></i> 아이디</label>
+            <input type="text" id="reg-username" name="reg-username" placeholder="4-20자 영문, 숫자" autocomplete="username">
+        </div>
+        <div class="input-group">
+            <label for="reg-password"><i class="fas fa-lock"></i> 비밀번호</label>
+            <input type="password" id="reg-password" name="reg-password" placeholder="8자 이상, 대소문자, 숫자, 특수문자 포함" autocomplete="new-password">
+            <small class="form-text">8자 이상, 대소문자, 숫자, 특수문자를 포함해야 합니다.</small>
+        </div>
+        <div class="input-group">
+            <label for="reg-password-confirm"><i class="fas fa-lock"></i> 비밀번호 확인</label>
+            <input type="password" id="reg-password-confirm" name="reg-password-confirm" placeholder="비밀번호를 다시 입력하세요" autocomplete="new-password">
+        </div>
+        <button id="register-button" type="button"><i class="fas fa-user-plus"></i> 회원가입</button>
+        <div id="reg-error-message" class="error-message" style="display: none;"></div>
+        <div id="reg-success-message" class="success-message" style="display: none;"></div>
+    </form>
+    
+    <footer class="toggle-form">
+        <p>이미 계정이 있으신가요? <a href="#" id="show-login">로그인</a></p>
+    </footer>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 4rem auto;
+    }
+    
+    .subtitle {
+        text-align: center;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+    }
+    
+    h1 {
+        text-align: center;
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .form-text {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-light);
+        margin-top: 0.25rem;
+    }
+    
+    /* 로그인 유지 체크박스 스타일 */
+    .remember-me-container {
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
+    }
+    
+    .remember-me-label {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: 35px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-color);
+        user-select: none;
+    }
+    
+    .remember-me-label input {
+        position: absolute;
+        opacity: 10;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+    
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #eee;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+    
+    .remember-me-label:hover input ~ .checkmark {
+        background-color: #ccc;
+    }
+    
+    .remember-me-label input:checked ~ .checkmark {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+    
+    .remember-me-label input:checked ~ .checkmark:after {
+        display: block;
+    }
+    
+    .remember-me-label .checkmark:after {
+        left: 7px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+    
+    .remember-text {
+        margin-top: 2px;
+    }
+
+    .site-footer {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 로그인 폼과 회원가입 폼 전환
+    document.getElementById('show-register').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'block';
+    });
+    
+    document.getElementById('show-login').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('login-form').style.display = 'block';
+    });
+    
+    // 로그인 버튼 클릭 이벤트
+    document.getElementById('login-button').addEventListener('click', function() {
+        performLogin();
+    });
+    
+    // 회원가입 버튼 클릭 이벤트
+    document.getElementById('register-button').addEventListener('click', function() {
+        performRegister();
+    });
+    
+    // 엔터 키 이벤트
+    document.getElementById('username').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('password').focus();
+        }
+    });
+    
+    document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performLogin();
+        }
+    });
+    
+    document.getElementById('reg-username').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('reg-password').focus();
+        }
+    });
+    
+    document.getElementById('reg-password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('reg-password-confirm').focus();
+        }
+    });
+    
+    document.getElementById('reg-password-confirm').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performRegister();
+        }
+    });
+    
+    // 로그인 함수
+    function performLogin() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('remember-me').checked;
+        
+        if (!username || !password) {
+            showError('아이디와 비밀번호를 모두 입력해주세요.', 'error-message');
+            return;
+        }
+        
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+                remember_me: rememberMe
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message, 'success-message');
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 1000);
+            } else {
+                showError(data.message, 'error-message');
+            }
+        })
+        .catch(error => {
+            console.error('로그인 오류:', error);
+            showError('서버 요청 중 오류가 발생했습니다.', 'error-message');
+        });
+    }
+    
+    // 회원가입 함수
+    function performRegister() {
+        const username = document.getElementById('reg-username').value;
+        const password = document.getElementById('reg-password').value;
+        const passwordConfirm = document.getElementById('reg-password-confirm').value;
+        
+        // 입력값 검증
+        if (!username || !password || !passwordConfirm) {
+            showError('모든 필드를 입력해주세요.', 'reg-error-message');
+            return;
+        }
+        
+        if (username.length < 4 || username.length > 20) {
+            showError('아이디는 4-20자 사이여야 합니다.', 'reg-error-message');
+            return;
+        }
+        
+        if (password.length < 8) {
+            showError('비밀번호는 8자 이상이어야 합니다.', 'reg-error-message');
+            return;
+        }
+        
+        if (password !== passwordConfirm) {
+            showError('비밀번호가 일치하지 않습니다.', 'reg-error-message');
+            return;
+        }
+        
+        // 서버에 회원가입 요청 전송
+        fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+                password_confirm: passwordConfirm
+            })
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.error) {
+                showError(data.error, 'reg-error-message');
+            } else if (data && data.success) {
+                showSuccess(data.success, 'reg-success-message');
+                // 성공 시 3초 후 로그인 폼으로 전환
+                setTimeout(() => {
+                    document.getElementById('register-form').style.display = 'none';
+                    document.getElementById('login-form').style.display = 'block';
+                    document.getElementById('success-message').textContent = '회원가입이 완료되었습니다. 로그인해주세요.';
+                    document.getElementById('success-message').style.display = 'block';
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = '/register'; // 등록 페이지로 리디렉션
+        });
+    }
+    
+    // 에러 메시지 표시 함수
+    function showError(message, elementId) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            // 3초 후 메시지 숨기기
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+    }
+    
+    // 성공 메시지 표시 함수
+    function showSuccess(message, elementId) {
+        const successElement = document.getElementById(elementId);
+        if (successElement) {
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+            
+            // 3초 후 메시지 숨기기
+            setTimeout(() => {
+                successElement.style.display = 'none';
+            }, 3000);
+        }
+    }
+});
+</script>
+{% endblock %} 

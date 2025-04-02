@@ -1,0 +1,29 @@
+/* 클럽 페이지 공통 스타일 */
+.club-page {
+    min-height: calc(100vh - 60px);
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.breadcrumb .separator {
+    color: #ccc;
+}
+
+.content-wrapper {
+    display: flex;
+    gap: 40px;
+    margin: 40px 0;
+}
+
+/* 나머지 공통 스타일... */ 

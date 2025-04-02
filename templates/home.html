@@ -1,0 +1,385 @@
+{% extends "layout.html" %}
+
+{% block title %}OSOF 동아리 - 소프트웨어를 통해 세상을 놀라게 하는 동아리{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="school-container">
+
+    <!-- 상단 배너 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>OSOF 동아리</h1>
+            <p class="banner-subtitle">소프트웨어를 통해 세상을 놀라게 하는 광덕고등학교 동아리 OSOF</p>
+        </div>
+    </div>
+
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="{{ url_for('freeboard') }}">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+
+                <!-- 메인 콘텐츠 영역 -->
+                <div class="main-content">
+                    <div class="grid-container">
+                        <div class="grid-item">
+                            <div class="image-container">
+                                <img src="{{ url_for('static', filename='images/section1.jpg') }}" alt="섹션 1">
+                                <div class="image-overlay">
+                                    <h3>섹션 1</h3>
+                                    <p>설명글을 입력하세요</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid-item">
+                            <div class="image-container">
+                                <img src="{{ url_for('static', filename='images/section2.jpg') }}" alt="섹션 2">
+                                <div class="image-overlay">
+                                    <h3>섹션 2</h3>
+                                    <p>설명글을 입력하세요</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid-item">
+                            <div class="image-container">
+                                <img src="{{ url_for('static', filename='images/section3.jpg') }}" alt="섹션 3">
+                                <div class="image-overlay">
+                                    <h3>섹션 3</h3>
+                                    <p>설명글을 입력하세요</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid-item">
+                            <div class="image-container">
+                                <img src="{{ url_for('static', filename='images/section4.jpg') }}" alt="섹션 4">
+                                <div class="image-overlay">
+                                    <h3>섹션 4</h3>
+                                    <p>설명글을 입력하세요</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 부드러운 스크롤 기능
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if(targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if(targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // 스크롤 애니메이션
+    const historyItems = document.querySelectorAll('.history-item');
+    
+    function checkScroll() {
+        historyItems.forEach(item => {
+            const itemTop = item.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
+            
+            if (itemTop < windowHeight - 100) {
+                item.classList.add('visible');
+            }
+        });
+    }
+    
+    // 초기 체크
+    checkScroll();
+    
+    // 스크롤 이벤트 리스너
+    window.addEventListener('scroll', checkScroll);
+});
+</script>
+
+<style>
+    /* ===== 기본 컨테이너 스타일 ===== */
+    .school-container {
+        background-color: #e3f2fd;
+        min-height: 100vh;
+    }
+
+    /* ===== 상단 텍스트 섹션 ===== */
+    .top-text-section {
+        background-color: #f8f9fa;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .text-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .welcome-text {
+        font-weight: 500;
+    }
+
+    .login-link {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .login-link a {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .login-link a:hover {
+        color: #0056b3;
+    }
+
+    /* ===== 상단 배너 스타일 ===== */
+    .top-banner {
+        position: relative;
+        height: 400px;
+        background: linear-gradient(135deg, #e3f2fd, #007bff);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .banner-content {
+        position: relative;
+        text-align: center;
+        width: 100%;
+        padding: 0 20px;
+        z-index: 1;
+    }
+
+    .banner-content h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        animation: fadeInDown 1s ease;
+        color: white;
+    }
+
+    .banner-subtitle {
+        font-size: 1.2rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        animation: fadeInUp 1s ease;
+        color: white;
+    }
+
+    /* ===== 콘텐츠 영역 스타일 ===== */
+    .content-area {
+        padding: 2rem 0;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    .row {
+        display: flex;
+        gap: 2rem;
+    }
+
+    /* ===== 사이드 메뉴 스타일 ===== */
+    .side-menu {
+        flex: 0 0 250px;
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .side-menu-title {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .side-menu li {
+        margin-bottom: 0.5rem;
+    }
+
+    .side-menu a {
+        display: block;
+        padding: 0.8rem 1rem;
+        color: #666;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .side-menu a:hover {
+        background: #f8f9fa;
+        color: #007bff;
+        padding-left: 1.5rem;
+    }
+
+    /* ===== 메인 콘텐츠 그리드 스타일 ===== */
+    .main-content {
+        flex: 1;
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 1.5rem;
+        height: 100%;
+        min-height: 400px;
+    }
+
+    .grid-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        height: 250px;
+    }
+
+    .image-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        color: white;
+        padding: 1.5rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .grid-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .grid-item:hover .image-container img {
+        transform: scale(1.1);
+    }
+
+    .grid-item:hover .image-overlay {
+        transform: translateY(0);
+    }
+
+    /* ===== 애니메이션 키프레임 ===== */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===== 반응형 디자인 ===== */
+    @media (max-width: 768px) {
+        .text-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .row {
+            flex-direction: column;
+        }
+        
+        .side-menu {
+            flex: none;
+            width: 100%;
+        }
+        
+        .grid-container {
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(4, 250px);
+            gap: 1rem;
+        }
+        
+        .banner-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .banner-subtitle {
+            font-size: 1rem;
+        }
+        
+        .top-banner {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}

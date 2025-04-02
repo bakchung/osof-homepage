@@ -1,0 +1,605 @@
+{% extends "layout.html" %}
+
+{% block title %}건의사항 - OSOF 동아리{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>건의사항</h1>
+            <p class="banner-subtitle">OSOF 동아리에 대한 의견이나 개선점을 자유롭게 제안해주세요</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('suggestion') }}">건의사항</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li class="active"><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">건의사항</h2>
+                            {% if session.logged_in %}
+                            <div class="section-tools">
+                                <button type="button" class="write-btn" id="writeSuggestionBtn">건의사항 작성</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="suggestion-info">
+                                <div class="info-card">
+                                    <div class="info-icon">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h3>건의사항 안내</h3>
+                                        <p>OSOF 동아리 운영에 관한 의견이나 개선점을 자유롭게 제안해주세요. 여러분의 소중한 의견은 더 나은 동아리를 만드는 데 큰 도움이 됩니다.</p>
+                                        <ul>
+                                            <li>실명 또는 익명으로 건의사항을 작성할 수 있습니다.</li>
+                                            <li>접수된 건의사항은 운영진이 검토 후 반영 여부를 결정합니다.</li>
+                                            <li>작성한 건의사항은 본인과 관리자만 확인할 수 있습니다.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="board-list">
+                                <table class="board-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="8%">번호</th>
+                                            <th width="50%">제목</th>
+                                            <th width="15%">작성자</th>
+                                            <th width="15%">작성일</th>
+                                            <th width="12%">상태</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in items %}
+                                        <tr>
+                                            <td>{{ items_total - ((page - 1) * per_page + loop.index0) }}</td>
+                                            <td class="title">
+                                                <a href="{{ url_for('suggestion', item_id=item.id) }}">{{ item.title }}</a>
+                                                {% if (now - item.created_at_datetime).total_seconds() < 86400 %}
+                                                <span class="new-post">NEW</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ item.display_name }}</td>
+                                            <td>{{ item.created_at[:10] }}</td>
+                                            <td>
+                                                {% if item.answered %}
+                                                <span class="status answered">답변완료</span>
+                                                {% else %}
+                                                <span class="status pending">검토중</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        {% if not items %}
+                                        <tr>
+                                            <td colspan="5" class="no-posts">등록된 건의사항이 없습니다.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            {% if total_pages > 1 %}
+                            <div class="pagination">
+                                {% if page > 1 %}
+                                <a href="{{ url_for('suggestion', page=page-1, search_type=search_type, search_query=search_query) }}" class="prev-page">&laquo; 이전</a>
+                                {% endif %}
+                                
+                                {% for p in range(max(1, page-2), min(total_pages+1, page+3)) %}
+                                <a href="{{ url_for('suggestion', page=p, search_type=search_type, search_query=search_query) }}" class="page-num {% if p == page %}active{% endif %}">{{ p }}</a>
+                                {% endfor %}
+                                
+                                {% if page < total_pages %}
+                                <a href="{{ url_for('suggestion', page=page+1, search_type=search_type, search_query=search_query) }}" class="next-page">다음 &raquo;</a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </section>
+                    
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">자주 묻는 질문</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="faq-list">
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>건의사항은 어떻게 처리되나요?</h3>
+                                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>제출된 건의사항은 동아리 운영진이 주기적으로 검토합니다. 중요도와 실현 가능성을 고려하여 반영 여부를 결정하며, 이메일을 남겨주신 경우 처리 결과를 개별적으로 안내해 드립니다.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>익명으로 작성할 수 있나요?</h3>
+                                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>네, 익명으로 건의사항을 작성할 수 있습니다. 건의사항 작성 시 익명 체크박스를 선택하면 익명으로 게시됩니다.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>특정 프로젝트나 활동에 관한 의견도 제출할 수 있나요?</h3>
+                                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>네, 동아리의 모든 활동과 프로젝트에 관한 의견을 자유롭게 제출하실 수 있습니다. 카테고리에서 '활동' 또는 '프로젝트'를 선택하시고 의견을 작성해주세요.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="faq-item">
+                                    <div class="faq-question">
+                                        <h3>건의사항 처리 기간은 얼마나 되나요?</h3>
+                                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>일반적으로 건의사항 접수 후 1~2주 내에 검토가 완료됩니다. 다만, 건의 내용에 따라 처리 기간이 달라질 수 있으며, 복잡한 사안은 좀 더 긴 시간이 소요될 수 있습니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+        --error-color: #f44336;
+        --success-color: #4caf50;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    /* 섹션 스타일 */
+    .content-section {
+        background-color: var(--white);
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .section-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .section-title {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--primary-color);
+    }
+    
+    .section-tools {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .write-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .write-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .section-body {
+        padding: 20px;
+    }
+    
+    /* 게시판 스타일 */
+    .board-list {
+        margin-top: 20px;
+    }
+    
+    .board-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .board-table th {
+        background-color: var(--secondary-color);
+        padding: 12px 15px;
+        text-align: center;
+        font-weight: 500;
+        color: var(--primary-color);
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .board-table td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+    
+    .board-table td.title {
+        text-align: left;
+    }
+    
+    .board-table td.title a {
+        color: var(--text-color);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .board-table td.title a:hover {
+        color: var(--primary-color);
+    }
+    
+    .new-post {
+        display: inline-block;
+        margin-left: 5px;
+        padding: 2px 5px;
+        background-color: var(--accent-color);
+        color: var(--white);
+        font-size: 0.7rem;
+        border-radius: 3px;
+    }
+    
+    .status {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 0.8rem;
+    }
+    
+    .status.pending {
+        background-color: var(--accent-color);
+        color: var(--white);
+    }
+    
+    .status.answered {
+        background-color: var(--success-color);
+        color: var(--white);
+    }
+    
+    .no-posts {
+        padding: 30px !important;
+        text-align: center;
+        color: var(--text-light);
+    }
+    
+    /* 페이지네이션 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .pagination a {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 0 3px;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: 3px;
+        transition: all 0.3s;
+    }
+    
+    .pagination a:hover {
+        background-color: var(--secondary-color);
+    }
+    
+    .pagination a.active {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-color: var(--primary-color);
+    }
+    
+    /* 건의사항 안내 */
+    .suggestion-info {
+        margin-bottom: 30px;
+    }
+    
+    .info-card {
+        background-color: var(--secondary-color);
+        border-radius: 5px;
+        padding: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .info-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+    }
+    
+    .info-content h3 {
+        margin: 0 0 10px;
+        color: var(--primary-color);
+    }
+    
+    .info-content p {
+        margin: 0 0 10px;
+        color: var(--text-color);
+    }
+    
+    .info-content ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text-color);
+    }
+    
+    /* FAQ 스타일 */
+    .faq-list {
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .faq-item {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+    
+    .faq-question {
+        padding: 15px 20px;
+        background-color: var(--white);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .faq-question h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-color);
+    }
+    
+    .toggle-icon {
+        transition: transform 0.3s;
+    }
+    
+    .faq-item.active .toggle-icon {
+        transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+    
+    .faq-item.active .faq-answer {
+        padding: 15px 20px;
+        max-height: 200px;
+    }
+    
+    .faq-answer p {
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('건의사항 페이지가 로드되었습니다.');
+    
+    // 건의사항 작성 버튼 클릭 이벤트
+    const writeBtn = document.getElementById('writeSuggestionBtn');
+    if (writeBtn) {
+        writeBtn.addEventListener('click', function() {
+            window.location.href = "{{ url_for('write_suggestion') }}";
+        });
+    }
+    
+    // FAQ 토글 기능
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        question.addEventListener('click', function() {
+            item.classList.toggle('active');
+        });
+    });
+});
+</script>
+{% endblock %} 

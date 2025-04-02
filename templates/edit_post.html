@@ -1,0 +1,514 @@
+{% extends "layout.html" %}
+
+{% block title %}글 수정 - 자율 자료 게시판{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>자율 자료 게시판</h1>
+            <p class="banner-subtitle">자율 자료 게시판 글 수정</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="/freeboard">자율 자료 게시판</a>
+                <span class="separator">></span>
+                <span class="current-page">글 수정</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li class="active"><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                <div>
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">글 수정</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            {% with messages = get_flashed_messages() %}
+                              {% if messages %}
+                                <div class="alert-messages">
+                                {% for message in messages %}
+                                  <div class="alert">{{ message }}</div>
+                                {% endfor %}
+                                </div>
+                              {% endif %}
+                            {% endwith %}
+                            
+                            <form action="{{ url_for('edit_post', post_id=post.id) }}" method="post" enctype="multipart/form-data" class="write-form">
+                                <div class="form-group">
+                                    <label for="title">제목</label>
+                                    <input type="text" id="title" name="title" value="{{ post.title }}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="content">내용</label>
+                                    <textarea id="content" name="content" rows="10" required>{{ post.content }}</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="category">카테고리</label>
+                                    <select id="category" name="category" required>
+                                        <option value="" disabled>카테고리 선택</option>
+                                        <option value="일반" {% if post.category == '일반' or not post.category %}selected{% endif %}>일반</option>
+                                        <option value="하드웨어" {% if post.category == '하드웨어' %}selected{% endif %}>하드웨어</option>
+                                        <option value="소프트웨어" {% if post.category == '소프트웨어' %}selected{% endif %}>소프트웨어</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="files">첨부파일</label>
+                                    
+                                    {% if post.files and post.files|length > 0 %}
+                                    <div class="existing-files">
+                                        <h4>현재 첨부된 파일</h4>
+                                        <ul class="file-list">
+                                            {% for file in post.files %}
+                                            <li class="file-item">
+                                                <div class="file-name">{{ file.filename }}</div>
+                                                <a href="{{ file.path }}" target="_blank" class="file-view">보기</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" id="files" name="file" multiple>
+                                        <div class="file-upload-info">추가할 파일 (최대 5개 파일, 각 파일 최대 10MB) <br>(허용 형식: pdf, doc, docx, txt, jpg, png, gif, zip)</div>
+                                    </div>
+                                    <div id="file-list" class="file-list"></div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="submit-btn">수정하기</button>
+                                    <a href="{{ url_for('view_post', post_id=post.id) }}" class="cancel-btn">취소</a>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    /* 섹션 스타일 */
+    .content-section {
+        background-color: var(--white);
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .section-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--secondary-color);
+    }
+    
+    .section-title {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--primary-color);
+    }
+    
+    .section-body {
+        padding: 20px;
+    }
+    
+    /* 폼 스타일 */
+    .write-form {
+        width: 100%;
+        margin: 0 auto;
+        background-color: var(--white);
+    }
+    
+    .form-group {
+        margin-bottom: 30px;
+    }
+    
+    .form-group:last-of-type {
+        margin-bottom: 40px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 12px;
+        font-weight: 500;
+        color: var(--primary-color);
+    }
+    
+    .form-group input[type="text"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 18px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 1.05rem;
+        font-family: 'Noto Sans KR', sans-serif;
+        margin-bottom: 5px;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 300px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .form-group select {
+        appearance: none;
+        background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23333' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E") no-repeat right 10px center/12px;
+        padding-right: 30px;
+    }
+    
+    .existing-files {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: var(--light-gray);
+        border-radius: 5px;
+    }
+    
+    .existing-files h4 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+        font-size: 1rem;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        border: 2px dashed var(--border-color);
+        padding: 25px;
+        border-radius: 6px;
+        transition: all 0.3s;
+        text-align: center;
+        background-color: var(--light-gray);
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .file-upload-wrapper:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(26, 87, 140, 0.05);
+    }
+    
+    .file-upload-wrapper input[type="file"] {
+        cursor: pointer;
+    }
+    
+    .file-upload-info {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .file-list {
+        margin-top: 20px;
+        list-style: none;
+        padding: 0;
+    }
+    
+    .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+    
+    .file-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-left: 10px;
+    }
+    
+    .file-size {
+        margin-left: 15px;
+        color: var(--text-light);
+        font-size: 0.85rem;
+        padding-right: 10px;
+    }
+    
+    .file-view {
+        margin-left: 15px;
+        color: var(--primary-color);
+        text-decoration: none;
+        padding: 3px 8px;
+        border-radius: 3px;
+        background-color: rgba(26, 87, 140, 0.1);
+        transition: all 0.2s;
+    }
+    
+    .file-view:hover {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 20px;
+        margin-top: 50px;
+        justify-content: center;
+    }
+    
+    .submit-btn, .cancel-btn {
+        padding: 14px 30px;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        min-width: 130px;
+        text-align: center;
+        text-decoration: none;
+    }
+    
+    .submit-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+    }
+    
+    .submit-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .cancel-btn {
+        background-color: var(--light-gray);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+    
+    .cancel-btn:hover {
+        background-color: var(--border-color);
+    }
+    
+    /* 경고 메시지 */
+    .alert-messages {
+        margin-bottom: 20px;
+    }
+    
+    .alert {
+        padding: 10px 15px;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .submit-btn, .cancel-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('게시글 수정 페이지가 로드되었습니다.');
+    
+    // 파일 업로드 처리
+    const fileInput = document.getElementById('files');
+    const fileList = document.getElementById('file-list');
+    
+    // 파일 선택 이벤트
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+    
+    function handleFiles(files) {
+        fileList.innerHTML = '';
+        
+        if (files.length > 0) {
+            Array.from(files).forEach(file => {
+                // 최대 파일 크기 체크 (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`파일 ${file.name}의 크기가 10MB를 초과합니다.`);
+                    return;
+                }
+                
+                const fileItem = document.createElement('div');
+                fileItem.classList.add('file-item');
+                
+                const fileName = document.createElement('div');
+                fileName.classList.add('file-name');
+                fileName.textContent = file.name;
+                
+                const fileSize = document.createElement('div');
+                fileSize.classList.add('file-size');
+                fileSize.textContent = formatFileSize(file.size);
+                
+                fileItem.appendChild(fileName);
+                fileItem.appendChild(fileSize);
+                
+                fileList.appendChild(fileItem);
+            });
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        else return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+    
+    // 폼 제출 전 유효성 검사
+    const writeForm = document.querySelector('.write-form');
+    
+    writeForm.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const content = document.getElementById('content').value.trim();
+        
+        if (!title) {
+            e.preventDefault();
+            alert('제목을 입력해주세요.');
+            document.getElementById('title').focus();
+            return;
+        }
+        
+        if (!content) {
+            e.preventDefault();
+            alert('내용을 입력해주세요.');
+            document.getElementById('content').focus();
+            return;
+        }
+    });
+});
+</script>
+{% endblock %} 

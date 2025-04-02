@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 관리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0033cc 0%, #6600cc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #0033cc, #6600cc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ee5253);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .delete-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5253);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .info-button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>회원 관리</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>아이디</th>
+                    <th>권한</th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody id="userList">
+                <!-- 회원 목록이 여기에 표시됩니다 -->
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('admin') }}" class="back-button" style="margin-right: 10px;">관리자 페이지로 돌아가기</a>
+        <a href="{{ url_for('home') }}" class="back-button">메인 페이지로 돌아가기</a>
+    </div>
+
+    <script>
+        // 회원 목록 표시 함수
+        function displayUsers(users) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            // users가 딕셔너리인 경우 배열로 변환
+            const userArray = Object.entries(users).map(([username, userData]) => ({
+                username: username,
+                ...userData
+            }));
+            
+            userArray.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.is_admin ? '관리자' : '일반 사용자'}</td>
+                    <td>
+                        ${!user.is_admin ? `
+                            <button onclick="deleteUser('${user.username}')" class="delete-button">삭제</button>
+                            <a href="/admin/user_info/${user.username}" class="info-button">정보</a>
+                        ` : ''}
+                    </td>
+                `;
+                userList.appendChild(row);
+            });
+        }
+
+        // 회원 삭제 함수
+        async function deleteUser(username) {
+            if (!confirm(`정말로 ${username} 회원을 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/delete_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('회원 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 페이지 로드 시 회원 목록 표시
+        window.addEventListener('DOMContentLoaded', function() {
+            const userData = JSON.parse('{{ users|tojson|safe }}');
+            displayUsers(userData);
+        });
+    </script>
+</body>
+</html> 

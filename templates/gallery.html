@@ -1,0 +1,602 @@
+{% extends "layout.html" %}
+
+{% block title %}갤러리 - OSOF 동아리{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>갤러리</h1>
+            <p class="banner-subtitle">OSOF 동아리의 다양한 활동 사진을 확인하세요</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('gallery') }}">갤러리</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li class="active"><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">갤러리</h2>
+                            <div class="section-tools">
+                                <div class="search-box">
+                                    <form action="{{ url_for('gallery') }}" method="get">
+                                        <select name="search_type" class="search-type">
+                                            <option value="title" {% if search_type == 'title' %}selected{% endif %}>제목</option>
+                                            <option value="content" {% if search_type == 'content' %}selected{% endif %}>내용</option>
+                                        </select>
+                                        <input type="text" name="search_query" class="search-input" placeholder="검색어를 입력하세요" value="{{ search_query or '' }}">
+                                        <button type="submit" class="search-btn">검색</button>
+                                    </form>
+                                </div>
+                                <button type="button" class="upload-btn" id="uploadGalleryBtn">사진 업로드</button>
+                            </div>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="gallery-grid">
+                                {% if items %}
+                                    {% for item in items %}
+                                    <div class="gallery-item">
+                                        <div class="gallery-image">
+                                            <img src="{{ item.image_path }}" alt="{{ item.title }}">
+                                            <div class="gallery-overlay">
+                                                <div class="overlay-content">
+                                                    <h3>{{ item.title }}</h3>
+                                                    <p>{{ item.created_at[:10] }}</p>
+                                                    <a href="{{ url_for('gallery', item_id=item.id) }}" class="view-btn">상세보기</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="gallery-caption">
+                                            <h4>{{ item.title }}</h4>
+                                            <p>{{ item.created_at[:10] }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="no-items">등록된 갤러리 항목이 없습니다.</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- 페이지네이션 -->
+                            <div class="pagination">
+                                {% if page > 1 %}
+                                <a href="{{ url_for('gallery', page=page-1, search_type=search_type, search_query=search_query) }}" class="page-btn prev-btn">&lt; 이전</a>
+                                {% endif %}
+                                
+                                {% for p in range(1, total_pages+1) %}
+                                    {% if p >= page - 2 and p <= page + 2 %}
+                                    <a href="{{ url_for('gallery', page=p, search_type=search_type, search_query=search_query) }}" class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page < total_pages %}
+                                <a href="{{ url_for('gallery', page=page+1, search_type=search_type, search_query=search_query) }}" class="page-btn next-btn">다음 &gt;</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 이미지 상세보기 모달 -->
+    <div class="gallery-modal" id="galleryModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-image-container">
+                <img src="" alt="" id="modalImage">
+            </div>
+            <div class="modal-info">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDate"></p>
+                <p id="modalDesc"></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    .content-section {
+        margin-bottom: 50px;
+    }
+    
+    /* 섹션 헤더 */
+    .section-header {
+        border-bottom: 2px solid var(--primary-color);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin: 0;
+        padding-bottom: 10px;
+    }
+    
+    .section-body {
+        padding: 0 10px;
+    }
+    
+    /* 검색창과 버튼 */
+    .section-tools {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .search-box {
+        display: flex;
+    }
+    
+    .search-box form {
+        display: flex;
+    }
+    
+    .search-type {
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px 0 0 4px;
+        color: var(--text-color);
+        background-color: var(--white);
+        font-size: 0.9rem;
+    }
+    
+    .search-input {
+        width: 250px;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-left: none;
+        font-size: 0.9rem;
+    }
+    
+    .search-btn {
+        padding: 8px 12px;
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .search-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .upload-btn {
+        padding: 8px 15px;
+        background-color: var(--accent-color);
+        color: var(--white);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+    }
+    
+    .upload-btn:hover {
+        background-color: #e08700;
+    }
+    
+    /* 갤러리 그리드 */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .gallery-item {
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    
+    .gallery-image {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .gallery-image img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s;
+    }
+    
+    .gallery-item:hover .gallery-image img {
+        transform: scale(1.05);
+    }
+    
+    .gallery-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .gallery-item:hover .gallery-overlay {
+        opacity: 1;
+    }
+    
+    .overlay-content {
+        text-align: center;
+        color: white;
+        padding: 20px;
+    }
+    
+    .overlay-content h3 {
+        margin: 0 0 5px;
+        font-size: 1.2rem;
+    }
+    
+    .overlay-content p {
+        margin: 0 0 15px;
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .view-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+    }
+    
+    .view-btn:hover {
+        background-color: #e08700;
+    }
+    
+    .gallery-caption {
+        padding: 10px;
+        background-color: white;
+    }
+    
+    .gallery-caption h4 {
+        margin: 0 0 5px;
+        font-size: 1rem;
+        color: var(--text-color);
+    }
+    
+    .gallery-caption p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+    
+    /* 페이지네이션 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .page-btn {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 0 3px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        color: var(--text-color);
+        background-color: var(--white);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .page-btn:hover {
+        background-color: var(--secondary-color);
+    }
+    
+    .page-btn.active {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-color: var(--primary-color);
+    }
+    
+    .no-items {
+        grid-column: 1 / -1;
+        padding: 30px;
+        text-align: center;
+        color: var(--text-light);
+        background-color: var(--light-gray);
+        border-radius: 5px;
+    }
+    
+    /* 모달 스타일 */
+    .gallery-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.8);
+        z-index: 1000;
+        overflow: auto;
+    }
+    
+    .modal-content {
+        position: relative;
+        background-color: white;
+        margin: 5% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 800px;
+        border-radius: 5px;
+        animation: modalOpen 0.3s;
+    }
+    
+    @keyframes modalOpen {
+        from {opacity: 0; transform: translateY(-30px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+    
+    .close-modal {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+    }
+    
+    .close-modal:hover {
+        color: var(--text-color);
+    }
+    
+    .modal-image-container {
+        margin-bottom: 20px;
+    }
+    
+    .modal-image-container img {
+        width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        border-radius: 5px;
+    }
+    
+    .modal-info h3 {
+        margin: 0 0 10px;
+        color: var(--primary-color);
+    }
+    
+    .modal-info p {
+        margin: 0 0 10px;
+    }
+    
+    #modalDate {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('갤러리 페이지가 로드되었습니다.');
+    
+    // 사진 업로드 버튼 클릭 이벤트
+    const uploadBtn = document.getElementById('uploadGalleryBtn');
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', function() {
+            window.location.href = "{{ url_for('upload_gallery') }}";
+        });
+    }
+    
+    // 갤러리 모달 관련 기능 (모달이 있는 경우)
+    const modal = document.getElementById('galleryModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDate = document.getElementById('modalDate');
+    const modalDesc = document.getElementById('modalDesc');
+    const closeModal = document.querySelector('.close-modal');
+    
+    if (modal && closeModal) {
+        // 모달 닫기 버튼
+        closeModal.addEventListener('click', function() {
+            modal.classList.remove('open');
+        });
+    }
+});
+</script>
+{% endblock %} 

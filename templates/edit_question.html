@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+
+{% block title %}질문 수정 - OSOF{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>질문 수정</h1>
+    <p class="subtitle">
+        <a href="{{ url_for('club_view_question', question_id=item.id) }}" class="back-link">← 질문 보기로 돌아가기</a>
+    </p>
+</div>
+
+<div class="edit-question-content">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="edit-form">
+        <form method="post" action="{{ url_for('club_edit_question', question_id=item.id) }}">
+            <div class="form-group">
+                <label for="title">제목 <span class="required">*</span></label>
+                <input type="text" id="title" name="title" value="{{ item.title }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="question">질문 내용 <span class="required">*</span></label>
+                <textarea id="question" name="question" rows="8" required>{{ item.question }}</textarea>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <label>
+                    <input type="checkbox" name="is_private" id="is_private" {% if item.is_private %}checked{% endif %}>
+                    <span>비공개 질문으로 설정 (관리자와 본인만 확인 가능)</span>
+                </label>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="primary-button">수정 완료</button>
+                <a href="{{ url_for('club_view_question', question_id=item.id) }}" class="secondary-button">취소</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="edit-guide">
+        <h2>질문 수정 시 안내사항</h2>
+        <ul>
+            <li>질문 제목과 내용은 필수 입력 항목입니다.</li>
+            <li>질문의 본래 의도를 유지하면서 수정해주세요.</li>
+            <li>이미 답변이 등록된 질문은 수정할 수 없습니다.</li>
+            <li>비공개 설정을 변경하면 질문의 공개 범위가 바로 적용됩니다.</li>
+        </ul>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.edit-question-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.back-link {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.flash-messages {
+    margin-bottom: 1.5rem;
+}
+
+.flash-message {
+    padding: 10px 15px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+section {
+    margin-bottom: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.required {
+    color: #e74c3c;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: flex-start;
+}
+
+.checkbox-group input {
+    width: auto;
+    margin-right: 10px;
+    margin-top: 3px;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.primary-button,
+.secondary-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    text-align: center;
+}
+
+.primary-button {
+    background-color: #3498db;
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #2980b9;
+}
+
+.secondary-button {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.secondary-button:hover {
+    background-color: #e0e0e0;
+}
+
+.edit-guide ul {
+    margin-left: 1.5rem;
+    line-height: 1.6;
+}
+
+.edit-guide li {
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .button-group {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 정보</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0033cc 0%, #6600cc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #0033cc, #6600cc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ee5253);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-info p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .logs-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .log-action {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>회원 정보</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+
+        <div class="user-info">
+            <p><strong>아이디:</strong> {{ user.username }}</p>
+            <p><strong>비밀번호 (해시):</strong> {{ decrypted_password }}</p>
+        </div>
+
+        <div class="logs-container">
+            <h2>활동 기록</h2>
+            {% if user.logs %}
+                {% for log in user.logs %}
+                <div class="log-entry">
+                    <span class="log-date">{{ log.timestamp }}</span>
+                    <span class="log-action">{{ log.action }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="log-entry">
+                    <span class="log-action">로그 기록이 없습니다.</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <a href="/admin/users" class="back-button">회원 목록으로 돌아가기</a>
+    </div>
+</body>
+</html> 

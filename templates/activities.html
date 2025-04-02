@@ -1,0 +1,482 @@
+{% extends "layout.html" %}
+
+{% block title %}활동 내용 - OSOF 동아리{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>활동 내용</h1>
+            <p class="banner-subtitle">OSOF 동아리의 다양한 활동 내용을 확인하세요</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('activities') }}">활동 내용</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="{{ url_for('freeboard') }}">자율 자료 게시판</a></li>
+                        <li class="active"><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">활동 내용</h2>
+                            <div class="section-tools">
+                                <form action="{{ url_for('activities') }}" method="get" class="search-box">
+                                    <select name="search_type" class="search-select">
+                                        <option value="all" {% if search_type == 'all' %}selected{% endif %}>전체</option>
+                                        <option value="title" {% if search_type == 'title' %}selected{% endif %}>제목</option>
+                                        <option value="content" {% if search_type == 'content' %}selected{% endif %}>내용</option>
+                                        <option value="author" {% if search_type == 'author' %}selected{% endif %}>작성자</option>
+                                    </select>
+                                    <input type="text" name="search_query" class="search-input" placeholder="검색어를 입력하세요" value="{{ search_query or '' }}">
+                                    <button type="submit" class="search-btn">검색</button>
+                                </form>
+                                {% if session.is_admin %}
+                                <button type="button" class="write-btn" id="writeActivityBtn">활동 등록</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="post-list">
+                                <table class="post-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="num-col">번호</th>
+                                            <th class="title-col">제목</th>
+                                            <th class="date-col">활동 날짜</th>
+                                            <th class="author-col">작성자</th>
+                                            <th class="views-col">조회수</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if items %}
+                                            {% for item in items %}
+                                            <tr>
+                                                <td class="num-col">{{ items_total - ((page - 1) * per_page + loop.index0) }}</td>
+                                                <td class="title-col">
+                                                    <a href="{{ url_for('activity', activity_id=item.id) }}">
+                                                        {{ item.title }}
+                                                        {% if item.files and item.files|length > 0 %}
+                                                        <span class="has-file"><i class="fas fa-paperclip"></i></span>
+                                                        {% endif %}
+                                                        {% if (now - item.created_at_datetime).total_seconds() < 86400 %}
+                                                        <span class="new-post">NEW</span>
+                                                        {% endif %}
+                                                    </a>
+                                                </td>
+                                                <td class="date-col">{{ item.activity_date }}</td>
+                                                <td class="author-col">{{ item.author }}</td>
+                                                <td class="views-col">{{ item.views }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="no-items">등록된 활동 내용이 없습니다.</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                                
+                                <!-- 페이지네이션 -->
+                                <div class="pagination">
+                                    {% if page > 1 %}
+                                    <a href="{{ url_for('activities', page=page-1, search_type=search_type, search_query=search_query) }}" class="page-btn prev-btn">&lt; 이전</a>
+                                    {% endif %}
+                                    
+                                    {% for p in range(1, total_pages+1) %}
+                                        {% if p >= page - 2 and p <= page + 2 %}
+                                        <a href="{{ url_for('activities', page=p, search_type=search_type, search_query=search_query) }}" class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if page < total_pages %}
+                                    <a href="{{ url_for('activities', page=page+1, search_type=search_type, search_query=search_query) }}" class="page-btn next-btn">다음 &gt;</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae), url('/static/images/banner_bg.jpg');
+        background-blend-mode: multiply;
+        background-size: cover;
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    /* 섹션 스타일 */
+    .content-section {
+        background-color: var(--white);
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .section-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .section-title {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--primary-color);
+    }
+    
+    .section-tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .search-box {
+        display: flex;
+    }
+    
+    .search-select {
+        border: 1px solid var(--border-color);
+        border-radius: 4px 0 0 4px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .search-input {
+        border: 1px solid var(--border-color);
+        border-left: none;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        width: 200px;
+    }
+    
+    .search-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        border-radius: 0 4px 4px 0;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    
+    .write-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+        border-radius: 4px;
+        padding: 6px 15px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    
+    .write-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .section-body {
+        padding: 20px;
+    }
+    
+    /* 게시글 목록 스타일 */
+    .post-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .post-table th {
+        background-color: var(--secondary-color);
+        padding: 12px 15px;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 500;
+        color: var(--primary-color);
+    }
+    
+    .post-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+    }
+    
+    .num-col {
+        width: 8%;
+    }
+    
+    .title-col {
+        width: 50%;
+    }
+    
+    .date-col {
+        width: 15%;
+    }
+    
+    .author-col {
+        width: 15%;
+    }
+    
+    .views-col {
+        width: 12%;
+    }
+    
+    .post-table td.title-col {
+        text-align: left;
+    }
+    
+    .post-table td.title-col a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .post-table td.title-col a:hover {
+        color: var(--primary-color);
+    }
+    
+    .has-file {
+        display: inline-block;
+        margin-left: 5px;
+        color: var(--primary-color);
+    }
+    
+    .new-post {
+        display: inline-block;
+        margin-left: 5px;
+        padding: 2px 5px;
+        background-color: var(--accent-color);
+        color: var(--white);
+        font-size: 0.7rem;
+        border-radius: 3px;
+    }
+    
+    .no-items {
+        text-align: center;
+        padding: 50px 0;
+        color: var(--text-light);
+    }
+    
+    /* 페이지네이션 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .page-btn {
+        display: inline-block;
+        margin: 0 3px;
+        padding: 5px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .page-btn:hover {
+        background-color: var(--secondary-color);
+    }
+    
+    .page-btn.active {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('활동 내용 페이지가 로드되었습니다.');
+    
+    // 활동 등록 버튼 클릭 이벤트
+    const writeBtn = document.getElementById('writeActivityBtn');
+    if (writeBtn) {
+        writeBtn.addEventListener('click', function() {
+            window.location.href = "{{ url_for('write_activity') }}";
+        });
+    }
+});
+</script>
+{% endblock %} 

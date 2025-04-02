@@ -1,0 +1,361 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ item.title }} - 갤러리{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>갤러리</h1>
+            <p class="banner-subtitle">갤러리 상세 보기</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('gallery') }}">갤러리</a>
+                <span class="separator">></span>
+                <span class="current-page">갤러리 상세 보기</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li class="active"><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">갤러리 상세 보기</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="gallery-view">
+                                <div class="gallery-header">
+                                    <h1 class="gallery-title">{{ item.title }}</h1>
+                                    <div class="gallery-meta">
+                                        <span class="gallery-author">작성자: {{ item.author }}</span>
+                                        <span class="gallery-date">작성일: {{ item.created_at }}</span>
+                                        <span class="gallery-views">조회수: {{ item.views }}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="gallery-image">
+                                    <img src="{{ item.image_path }}" alt="{{ item.title }}" class="main-image">
+                                </div>
+                                
+                                <div class="gallery-content">
+                                    {{ item.content | nl2br | safe }}
+                                </div>
+                                
+                                <div class="post-navigation">
+                                    <a href="{{ url_for('gallery') }}" class="list-btn">목록</a>
+                                    {% if session.is_admin or session.username == item.author %}
+                                    <div class="author-actions">
+                                        <a href="{{ url_for('rewrite_gallery', item_id=item.id) }}" class="edit-btn">수정</a>
+                                        <a href="#" class="delete-btn" onclick="deleteGallery('{{ item.id }}')">삭제</a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    /* 갤러리 상세 보기 스타일 */
+    .gallery-view {
+        background-color: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .gallery-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--secondary-color);
+    }
+    
+    .gallery-title {
+        margin: 0 0 15px;
+        font-size: 1.4rem;
+        color: var(--primary-color);
+        word-break: break-word;
+    }
+    
+    .gallery-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+    
+    .gallery-author {
+        font-weight: 500;
+    }
+    
+    .gallery-image {
+        padding: 20px;
+        text-align: center;
+        background-color: var(--light-gray);
+    }
+    
+    .main-image {
+        max-width: 100%;
+        max-height: 500px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .gallery-content {
+        padding: 20px;
+        min-height: 150px;
+        line-height: 1.6;
+        white-space: pre-line;
+        word-break: break-word;
+    }
+    
+    .post-navigation {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 20px;
+        border-top: 1px solid var(--border-color);
+        background-color: var(--light-gray);
+    }
+    
+    .list-btn, .edit-btn, .delete-btn {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .list-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .list-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .author-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .edit-btn {
+        background-color: var(--accent-color);
+        color: var(--white);
+        margin-right: 10px;
+    }
+    
+    .edit-btn:hover {
+        background-color: #e08700;
+    }
+    
+    .delete-btn {
+        background-color: #dc3545;
+        color: var(--white);
+    }
+    
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('갤러리 상세 보기 페이지가 로드되었습니다.');
+    
+    // 갤러리 삭제 확인
+    window.deleteGallery = function(itemId) {
+        if (confirm('정말 이 갤러리 항목을 삭제하시겠습니까?')) {
+            window.location.href = "{{ url_for('delete_gallery', item_id=item.id) }}";
+        }
+    };
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,566 @@
+{% extends "layout.html" %}
+
+{% block title %}OSOF 동아리 - 소프트웨어를 통해 세상을 놀라게 하는 동아리{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>OSOF 동아리</h1>
+            <p class="banner-subtitle">소프트웨어를 통해 세상을 놀라게 하는 광덕고등학교 동아리 OSOF</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('index') }}">소개</a>
+            </div>
+        </div>
+    </div>
+    
+<!-- 주요 내용 영역 -->
+<div class="content-area">
+    <div class="container">
+        <div class="row">
+            <!-- 좌측 메뉴 -->
+            <div class="side-menu">
+                <h3 class="side-menu-title">OSOF 동아리</h3>
+                <ul>
+                    <li class="active"><a href="{{ url_for('index') }}">소개</a></li>
+                    <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                    <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                    <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                    <li><a href="/freeboard">자율 자료 게시판</a></li>
+                    <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                    <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                </ul>
+            </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <!-- 동아리 소개 -->
+                    <section class="content-section" id="intro">
+                        <div class="section-header">
+                            <h2 class="section-title">동아리 소개</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="intro-highlight">
+                                <p><strong>광덕고등학교 오소프(OSOF)는 '소프트웨어를 통해 세상을 놀라게 하고 싶다'는 의미로 2015년에 만들어진 동아리입니다.</strong> OSOF는 다양한 소프트웨어 개발 프로젝트와 로봇 공학 활동을 통해 학생들이 창의적이고 혁신적인 사고를 기를 수 있도록 돕고 있습니다.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- 연혁 및 수상실적 -->
+                    <section class="content-section" id="history">
+                        <div class="section-header">
+                            <h2 class="section-title">연혁 및 수상 실적</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <ul class="history-list">
+                                <li><strong>2015</strong>: 오소프 동아리 개설, SW앱 공모전 대상(부총리겸교육부장관), SW앱 공모전 장려상(한국전자통신연구원장)</li>
+                                <li><strong>2016</strong>: FLL 광주전남 지역대회 은상, Korea Wi.content Contest 은상, 전국 고등학교 동아리 소프트웨어경진대회 장려상, 현대자동차 청소년 모형자동차대회 프로젝트 수상</li>
+                                <li><strong>2017</strong>: FIRST Tech Challenge Judge Award 수상, 광주교육정보 유공자 학생2명 표창(광주광역시교육감), 호주맥쿼리 대학교 전액장학금 지원 진학</li>
+                                <li><strong>2018</strong>: 대한민국 인재상 수상, 3년 연속 IT 우수 장학생 수상(전자신문사), 3년 연속 Qualcomm 장학팀 선정</li>
+                                <li><strong>2019</strong>: 공개SW 개발자대회 AI개발 특별상, Korea Wi.content Contest 장려상, 정보영재 정보보호 경진대회 장려상</li>
+                                <li><strong>2020</strong>: 인공지능 개발 해커톤 대회 한국학술정보원장상, FIRST Tech Challenge 로봇제작 1위</li>
+                                <li><strong>2021</strong>: FIRST Tech Challenge 경기분야 2위</li>
+                                <li><strong>2022</strong>: FIRST Championship JUDGES CHOICE AWARD 수상, FIRST Championship 진출, FIRST Tech Challenge 종합 3위</li>
+                            </ul>
+                        </div>
+                    </section>
+                    
+                    <!-- 주요 활동 -->
+                    <section class="content-section" id="activities">
+                        <div class="section-header">
+                            <h2 class="section-title">주요 활동</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <ul class="activities-list">
+                                <li>소프트웨어 개발: 앱 및 웹 개발, 인공지능 알고리즘 구현 등 다양한 소프트웨어 개발 프로젝트를 진행합니다.</li>
+                                <li>로봇 공학: FIRST Tech Challenge 대회 참가를 위한 로봇 설계 및 제작, 프로그래밍을 진행합니다.</li>
+                                <li>대회 참가: 국내외 소프트웨어 및 로봇 경진대회에 참가하여 기량을 펼치고 있습니다.</li>
+                                <li>멘토링 활동: 선배들이 후배들에게 프로그래밍을 가르치는 멘토링 프로그램을 운영합니다.</li>
+                            </ul>
+                        </div>
+                    </section>
+                    
+                    <!-- 보도자료 -->
+                    <section class="content-section" id="news">
+                        <div class="section-header">
+                            <h2 class="section-title">보도자료</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <ul class="news-list">
+                                <li><strong>2022.12.15</strong>: 광덕고 OSOF 동아리, FIRST Championship에서 국제 대회 수상 (광주일보)</li>
+                                <li><strong>2022.06.10</strong>: 광덕고 OSOF, FIRST Tech Challenge 종합 3위 입상 (전자신문)</li>
+                                <li><strong>2021.09.25</strong>: 광덕고 소프트웨어 동아리 OSOF, 로봇 경진대회서 우수한 성적 (광주교육신문)</li>
+                                <li><strong>2020.11.05</strong>: 광덕고 학생들, AI 해커톤 대회에서 한국학술정보원장상 수상 (광남일보)</li>
+                            </ul>
+                        </div>
+                    </section>
+                    
+                    <!-- 활동 사진 -->
+                    <section class="content-section" id="photos">
+                        <div class="section-header">
+                            <h2 class="section-title">활동 사진</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="photos-grid">
+                                <div class="photo-item">
+                                    <div class="photo-caption">FTC 로봇 제작 과정</div>
+                                </div>
+                                
+                                <div class="photo-item">
+                                    <div class="photo-caption">FIRST Championship 참가</div>
+                                </div>
+                                
+                                <div class="photo-item">
+                                    <div class="photo-caption">인공지능 개발 해커톤</div>
+                                </div>
+                                
+                                <div class="photo-item">
+                                    <div class="photo-caption">동아리 정기 활동</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- 가입 안내 -->
+                    <section class="content-section" id="join">
+                        <div class="section-header">
+                            <h2 class="section-title">가입 안내</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <div class="join-info">
+                                <div class="join-text">
+                                    <h3>OSOF 동아리는 소프트웨어와 로봇 공학에 관심 있는 학생들을 환영합니다!</h3>
+                                    <p>프로그래밍 경험이 없어도 배우고자 하는 열정만 있다면 누구나 지원 가능합니다.</p>
+                                    
+                                    <div class="join-steps">
+                                        <h4>가입 절차</h4>
+                                        <ol>
+                                            <li>동아리 지원서 제출 (3월 둘째 주)</li>
+                                            <li>간단한 면접 (코딩 경험 없어도 지원 가능)</li>
+                                            <li>최종 합격자 발표</li>
+                                        </ol>
+                                    </div>
+                                    
+                                    <div class="contact-info">
+                                        <h4>문의처</h4>
+                                        <p>동아리 담당 교사: 이재원</p>
+                                        <p>동아리장: 장지훈</p>
+                                        <p>이메일:</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 하단 배너 링크 -->
+    <div class="bottom-banners">
+        <div class="container">
+            <h3 class="banner-title">관련 사이트</h3>
+            <div class="banner-list">
+                <a href="https://www.firstinspires.org/robotics/ftc" target="_blank" class="banner-item">FIRST Tech Challenge</a>
+                <a href="https://koi.or.kr/" target="_blank" class="banner-item">한국정보올림피아드</a>
+                <a href="https://www.software.kr/" target="_blank" class="banner-item">소프트웨어중심사회</a>
+                <a href="https://www.gen.go.kr/main/main.php#none" target="_blank" class="banner-item">광주광역시교육청</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 부드러운 스크롤 기능 (페이지 내 이동만 적용)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if(targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if(targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    // 스크롤 애니메이션
+    const historyItems = document.querySelectorAll('.history-item');
+    
+    function checkScroll() {
+        historyItems.forEach(item => {
+            const itemTop = item.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
+            
+            if (itemTop < windowHeight - 100) {
+                item.classList.add('visible');
+            }
+        });
+    }
+    
+    // 초기 체크
+    checkScroll();
+    
+    // 스크롤 이벤트 리스너
+    window.addEventListener('scroll', checkScroll);
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/static/images/banner_bg.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    .quick-links {
+        margin-top: 30px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+    }
+    
+    .quick-links h4 {
+        font-size: 1rem;
+        margin: 0;
+        padding: 10px 15px;
+        background-color: var(--secondary-color);
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .quick-links ul {
+        list-style: none;
+        padding: 10px 15px;
+        margin: 0;
+    }
+    
+    .quick-links li {
+        margin-bottom: 8px;
+    }
+    
+    .quick-links li:last-child {
+        margin-bottom: 0;
+    }
+    
+    .quick-links a {
+        color: var(--text-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: block;
+        padding: 3px 0;
+    }
+    
+    .quick-links a:hover {
+        color: var(--primary-color);
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    .content-section {
+        margin-bottom: 50px;
+    }
+    
+    .section-header {
+        border-bottom: 2px solid var(--primary-color);
+        margin-bottom: 20px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin: 0;
+        padding-bottom: 10px;
+    }
+    
+    .section-body {
+        padding: 0 10px;
+    }
+    
+    /* 소개 섹션 */
+    .intro-image {
+        float: right;
+        width: 40%;
+        margin: 0 0 20px 20px;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .intro-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .intro-text {
+        overflow: hidden;
+    }
+    
+    .emphasis-text {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+    
+    .eng-text {
+        color: var(--text-light);
+        font-style: italic;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px dashed var(--border-color);
+    }
+    
+    /* 주요 활동 */
+    .activities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .activity-item {
+        background-color: var(--secondary-color);
+        border-radius: 5px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+    
+    .activity-item:hover {
+        transform: translateY(-5px);
+    }
+    
+    .activity-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+    
+    .activity-item h3 {
+        color: var(--primary-dark);
+        margin: 0 0 10px;
+        font-size: 1.2rem;
+    }
+    
+    .activity-item p {
+        margin: 0;
+        color: var(--text-color);
+    }
+    
+    /* 관리자 컨트롤 패널 스타일 */
+    .admin-control-panel {
+        background-color: #f8f9fa;
+        padding: 15px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .admin-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .admin-controls h3 {
+        margin: 0;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+    }
+    
+    .admin-controls h3 i {
+        margin-right: 10px;
+    }
+    
+    .admin-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .admin-control-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+    
+    .admin-control-btn i {
+        margin-right: 5px;
+    }
+    
+    .admin-control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %} 

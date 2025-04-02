@@ -1,0 +1,628 @@
+{% extends "layout.html" %}
+
+{% block title %}활동 내용 수정 - OSOF 동아리{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>활동 내용 수정</h1>
+            <p class="banner-subtitle">활동 내용 정보를 수정합니다</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('activities') }}">활동 내용</a>
+                <span class="separator">></span>
+                <span class="current-page">활동 내용 수정</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li class="active"><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">활동 내용 수정</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    <div class="flash-messages">
+                                        {% for message in messages %}
+                                            <div class="flash-message">{{ message }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            <form action="{{ url_for('rewrite_activity', activity_id=item.id) }}" method="post" enctype="multipart/form-data" class="write-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="title">제목 <span class="required">*</span></label>
+                                        <input type="text" id="title" name="title" value="{{ item.title }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="activity_date">활동 날짜 <span class="required">*</span></label>
+                                        <input type="date" id="activity_date" name="activity_date" value="{{ item.activity_date }}" required>
+                                    </div>
+                                    
+                                    <div class="form-group half">
+                                        <label for="activity_location">활동 장소</label>
+                                        <input type="text" id="activity_location" name="activity_location" value="{{ item.activity_location }}">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="category">카테고리</label>
+                                        <select id="category" name="category">
+                                            <option value="HW" {% if item.category == 'HW' %}selected{% endif %}>하드웨어</option>
+                                            <option value="SW" {% if item.category == 'SW' %}selected{% endif %}>소프트웨어</option>
+                                            <option value="일반" {% if item.category == '일반' %}selected{% endif %}>일반</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group half">
+                                        <label for="participants">참여자</label>
+                                        <input type="text" id="participants" name="participants" value="{{ item.participants }}" placeholder="예: 홍길동, 김철수, 이영희">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="content">활동 내용 <span class="required">*</span></label>
+                                    <textarea id="content" name="content" rows="15" required>{{ item.content }}</textarea>
+                                </div>
+                                
+                                <div class="form-group file-upload">
+                                    <label>첨부 파일</label>
+                                    
+                                    <div class="current-files">
+                                        <h4>현재 첨부 파일</h4>
+                                        {% if item.files and item.files|length > 0 %}
+                                            <ul class="attached-files">
+                                                {% for file in item.files %}
+                                                <li>
+                                                    <span class="file-name">{{ file.filename }}</span>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p>첨부된 파일이 없습니다.</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="file-upload-wrapper">
+                                        <div class="upload-area">
+                                            <input type="file" name="files" id="file-upload" multiple>
+                                            <div class="upload-message">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>파일을 선택하거나 여기에 드래그하세요</p>
+                                                <p class="small">다중 선택 가능</p>
+                                            </div>
+                                        </div>
+                                        <div id="file-list-container" style="display: none;">
+                                            <h4>새로 추가할 파일</h4>
+                                            <ul id="file-list"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="submit-btn">수정 완료</button>
+                                    <a href="{{ url_for('activity', activity_id=item.id) }}" class="cancel-btn">취소</a>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --danger-color: #dc3545;
+        --success-color: #28a745;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae), url('/static/images/banner_bg.jpg');
+        background-blend-mode: multiply;
+        background-size: cover;
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    .content-section {
+        background-color: var(--white);
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .section-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .section-title {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+    
+    .section-body {
+        padding: 20px;
+    }
+    
+    /* 플래시 메시지 */
+    .flash-messages {
+        margin-bottom: 20px;
+    }
+    
+    .flash-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    
+    /* 폼 스타일 */
+    .write-form {
+        max-width: 100%;
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+        padding: 0 10px;
+        width: 100%;
+    }
+    
+    .form-group.half {
+        width: 50%;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 200px;
+    }
+    
+    .required {
+        color: var(--danger-color);
+    }
+    
+    /* 파일 업로드 영역 */
+    .file-upload-wrapper {
+        margin-top: 15px;
+    }
+    
+    .current-files {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+    }
+    
+    .current-files h4 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .attached-files {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .attached-files li {
+        padding: 5px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .attached-files li:last-child {
+        border-bottom: none;
+    }
+    
+    .upload-area {
+        position: relative;
+        border: 2px dashed var(--border-color);
+        border-radius: 4px;
+        padding: 20px;
+        text-align: center;
+        background-color: var(--light-gray);
+        transition: all 0.3s;
+    }
+    
+    .upload-area:hover {
+        border-color: var(--primary-color);
+    }
+    
+    .upload-area input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .upload-message {
+        color: var(--text-light);
+    }
+    
+    .upload-message i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: var(--primary-color);
+    }
+    
+    .upload-message p {
+        margin: 5px 0;
+    }
+    
+    .upload-message .small {
+        font-size: 0.8rem;
+    }
+    
+    /* 파일 목록 */
+    #file-list-container {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+    }
+    
+    #file-list-container h4 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        color: var(--primary-color);
+    }
+    
+    #file-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #file-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    #file-list li:last-child {
+        border-bottom: none;
+    }
+    
+    /* 폼 액션 버튼 */
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .submit-btn,
+    .cancel-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        text-decoration: none;
+    }
+    
+    .submit-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+    }
+    
+    .submit-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .cancel-btn {
+        background-color: var(--light-gray);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+    
+    .cancel-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    /* 반응형 */
+    @media (max-width: 768px) {
+        .row {
+            flex-direction: column;
+        }
+        
+        .side-menu,
+        .main-content {
+            width: 100%;
+            padding-right: 0;
+        }
+        
+        .side-menu {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.half {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUpload = document.getElementById('file-upload');
+    const fileList = document.getElementById('file-list');
+    const fileListContainer = document.getElementById('file-list-container');
+    
+    // 파일 선택 시 목록 표시
+    fileUpload.addEventListener('change', function() {
+        fileList.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            for (let i = 0; i < this.files.length; i++) {
+                const file = this.files[i];
+                const li = document.createElement('li');
+                
+                li.innerHTML = `
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                `;
+                
+                fileList.appendChild(li);
+            }
+            
+            fileListContainer.style.display = 'block';
+        } else {
+            fileListContainer.style.display = 'none';
+        }
+    });
+    
+    // 파일 크기 형식화 함수
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // 드래그 앤 드롭 기능
+    const uploadArea = document.querySelector('.upload-area');
+    
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#3178ae';
+        this.style.backgroundColor = 'rgba(231, 238, 244, 0.7)';
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#ddd';
+        this.style.backgroundColor = '#f5f5f5';
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#ddd';
+        this.style.backgroundColor = '#f5f5f5';
+        
+        const input = this.querySelector('input[type="file"]');
+        input.files = e.dataTransfer.files;
+        
+        // 파일 입력 변경 이벤트 트리거
+        const event = new Event('change', { bubbles: true });
+        input.dispatchEvent(event);
+    });
+});
+</script>
+{% endblock %} 

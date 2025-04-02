@@ -1,0 +1,519 @@
+{% extends "layout.html" %}
+
+{% block title %}활동 일정 {% if item %}수정{% else %}작성{% endif %} - OSOF 동아리{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>활동 일정</h1>
+            <p class="banner-subtitle">동아리 활동과 이벤트를 등록하세요</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('schedule') }}">활동 일정</a>
+                <span class="separator">></span>
+                <span class="current-page">일정 {% if item %}수정{% else %}등록{% endif %}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li class="active"><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                <div>
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">활동 일정 {% if item %}수정{% else %}등록{% endif %}</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            <form id="scheduleForm" action="{% if item %}{{ url_for('edit_schedule', item_id=item.id) }}{% else %}{{ url_for('write_schedule') }}{% endif %}" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="title">제목</label>
+                                    <input type="text" class="form-control" id="title" name="title" value="{% if item %}{{ item.title }}{% endif %}" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="event_date">일정 날짜</label>
+                                        <input type="date" class="form-control" id="event_date" name="event_date" value="{% if item %}{{ item.event_date }}{% endif %}" required>
+                                    </div>
+                                    
+                                    <div class="form-group col-md-4">
+                                        <label for="event_time">시간 (선택사항)</label>
+                                        <input type="time" class="form-control" id="event_time" name="event_time" value="{% if item %}{{ item.event_time }}{% endif %}">
+                                    </div>
+                                    
+                                    <div class="form-group col-md-4">
+                                        <label for="event_location">장소 (선택사항)</label>
+                                        <input type="text" class="form-control" id="event_location" name="event_location" value="{% if item %}{{ item.event_location }}{% endif %}">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="content">내용</label>
+                                    <textarea class="form-control" id="content" name="content" rows="10" required>{% if item %}{{ item.content }}{% endif %}</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="file">첨부파일</label>
+                                    <input type="file" class="form-control-file" id="file" name="file" multiple>
+                                    {% if item and item.files and item.files|length > 0 %}
+                                    <div class="current-files">
+                                        <h4>현재 첨부된 파일</h4>
+                                        <ul class="attached-files-list">
+                                            {% for file in item.files %}
+                                            <li>
+                                                {{ file.filename }}
+                                                <label class="delete-file-checkbox">
+                                                    <input type="checkbox" name="delete_files" value="{{ file.filename }}">
+                                                    삭제
+                                                </label>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="submit-btn">{% if item %}수정하기{% else %}등록하기{% endif %}</button>
+                                    <a href="{{ url_for('schedule') }}" class="cancel-btn">취소</a>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 0;
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 주요 내용 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+        padding-left: 30px;
+    }
+    
+    /* 섹션 스타일 */
+    .content-section {
+        background-color: var(--white);
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .section-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--secondary-color);
+    }
+    
+    .section-title {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--primary-color);
+    }
+    
+    .section-body {
+        padding: 20px;
+    }
+    
+    /* 폼 스타일 */
+    #scheduleForm {
+        width: 100%;
+        margin: 0 auto;
+        background-color: var(--white);
+        border: none;
+    }
+    
+    .form-group {
+        margin-bottom: 30px;
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -15px;
+        margin-left: -15px;
+        margin-bottom: 15px;
+    }
+    
+    .form-row > .form-group {
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 12px;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 14px 18px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 1.05rem;
+        color: var(--text-color);
+        margin-bottom: 5px;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(26, 87, 140, 0.2);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 300px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .form-control-file {
+        padding: 10px 0;
+        margin-top: 8px;
+    }
+    
+    /* 파일 업로드 스타일 */
+    .file-upload-wrapper {
+        position: relative;
+        border: 2px dashed var(--border-color);
+        padding: 25px;
+        border-radius: 6px;
+        transition: all 0.3s;
+        text-align: center;
+        background-color: var(--light-gray);
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .file-upload-wrapper:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(26, 87, 140, 0.05);
+    }
+    
+    .file-upload-info {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .current-files {
+        margin-top: 25px;
+        padding: 20px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+    }
+    
+    .current-files h4 {
+        margin: 0 0 15px;
+        font-size: 0.95rem;
+        color: var(--primary-color);
+    }
+    
+    .attached-files-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .attached-files-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .attached-files-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .delete-file-checkbox {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        color: #dc3545;
+        cursor: pointer;
+        padding-left: 15px;
+    }
+    
+    .delete-file-checkbox input {
+        margin-right: 5px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 20px;
+        margin-top: 50px;
+        justify-content: center;
+    }
+    
+    .submit-btn, .cancel-btn {
+        padding: 14px 30px;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+        min-width: 130px;
+        text-align: center;
+    }
+    
+    .submit-btn {
+        background-color: var(--primary-color);
+        color: var(--white);
+        border: none;
+    }
+    
+    .submit-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .cancel-btn {
+        background-color: var(--light-gray);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+    }
+    
+    .cancel-btn:hover {
+        background-color: var(--border-color);
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            display: block;
+        }
+        
+        .col-md-4 {
+            max-width: 100%;
+        }
+        
+        .form-row > .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .submit-btn, .cancel-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('활동 일정 작성 페이지가 로드되었습니다.');
+    
+    const form = document.getElementById('scheduleForm');
+    form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const content = document.getElementById('content').value.trim();
+        const eventDate = document.getElementById('event_date').value.trim();
+        
+        if (!title || !content || !eventDate) {
+            e.preventDefault();
+            alert('제목, 내용, 일정 날짜를 모두 작성해주세요.');
+            return false;
+        }
+        
+        // 날짜 유효성 검사
+        const today = new Date();
+        const selectedDate = new Date(eventDate);
+        
+        // 날짜 형식이 유효한지 확인
+        if (isNaN(selectedDate.getTime())) {
+            e.preventDefault();
+            alert('유효한 날짜를 입력해주세요.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %} 

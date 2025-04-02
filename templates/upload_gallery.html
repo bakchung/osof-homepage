@@ -1,0 +1,455 @@
+{% extends "layout.html" %}
+
+{% block title %}이미지 업로드 - 갤러리{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="school-container">
+    <!-- 상단 배너 이미지 -->
+    <div class="top-banner">
+        <div class="banner-content">
+            <h1>갤러리</h1>
+            <p class="banner-subtitle">갤러리 이미지 업로드</p>
+        </div>
+    </div>
+    
+    <!-- 페이지 내비게이션 -->
+    <div class="page-navigation">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{{ url_for('home') }}">홈</a>
+                <span class="separator">></span>
+                <a href="{{ url_for('gallery') }}">갤러리</a>
+                <span class="separator">></span>
+                <span class="current-page">이미지 업로드</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 주요 내용 영역 -->
+    <div class="content-area">
+        <div class="container">
+            <div class="row">
+                <!-- 좌측 메뉴 -->
+                <div class="side-menu">
+                    <h3 class="side-menu-title">OSOF 동아리</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">소개</a></li>
+                        <li><a href="{{ url_for('notice') }}">공지사항</a></li>
+                        <li><a href="{{ url_for('schedule') }}">활동 일정</a></li>
+                        <li class="active"><a href="{{ url_for('gallery') }}">갤러리</a></li>
+                        <li><a href="/freeboard">자율 자료 게시판</a></li>
+                        <li><a href="{{ url_for('activities') }}">활동 내용</a></li>
+                        <li><a href="{{ url_for('suggestion') }}">건의사항</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 주요 콘텐츠 영역 -->
+                <div class="main-content">
+                    <section class="content-section">
+                        <div class="section-header">
+                            <h2 class="section-title">갤러리 이미지 업로드</h2>
+                        </div>
+                        
+                        <div class="section-body">
+                            {% with messages = get_flashed_messages() %}
+                              {% if messages %}
+                                <div class="alert-messages">
+                                {% for message in messages %}
+                                  <div class="alert">{{ message }}</div>
+                                {% endfor %}
+                                </div>
+                              {% endif %}
+                            {% endwith %}
+                            
+                            <form action="{{ url_for('upload_gallery') }}" method="post" enctype="multipart/form-data" id="upload-form">
+                                <div class="form-group">
+                                    <label for="title">제목</label>
+                                    <input type="text" id="title" name="title" required placeholder="제목을 입력하세요">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="content">내용</label>
+                                    <textarea id="content" name="content" placeholder="이미지에 대한 설명을 입력하세요"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="image">이미지 파일</label>
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" id="image" name="image" accept="image/*" required>
+                                        <div class="file-upload-info">
+                                            <i class="fas fa-upload"></i>
+                                            <p>이미지 파일을 드래그하거나 클릭하여 업로드하세요.</p>
+                                            <p class="small">(지원 형식: JPG, PNG, GIF / 최대 5MB)</p>
+                                        </div>
+                                    </div>
+                                    <div id="image-preview" class="image-preview"></div>
+                                </div>
+                                
+                                <div class="form-buttons">
+                                    <button type="submit" class="submit-btn">업로드</button>
+                                    <a href="{{ url_for('gallery') }}" class="cancel-btn">취소</a>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #1a578c;
+        --primary-light: #3178ae;
+        --primary-dark: #0c3a64;
+        --secondary-color: #e7eef4;
+        --accent-color: #ff9800;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #ddd;
+        --white: #fff;
+        --light-gray: #f5f5f5;
+    }
+    
+    /* 메인 컨테이너 */
+    .school-container {
+        font-family: 'Noto Sans KR', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* 상단 배너 */
+    .top-banner {
+        background: linear-gradient(45deg, #1a578c, #3178ae);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+    }
+    
+    .banner-content h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .banner-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* 페이지 내비게이션 */
+    .page-navigation {
+        background-color: var(--secondary-color);
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        color: var(--primary-color);
+    }
+    
+    .separator {
+        margin: 0 10px;
+        color: var(--text-light);
+    }
+    
+    .current-page {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* 콘텐츠 영역 */
+    .content-area {
+        padding: 30px 0 60px;
+        background-color: var(--white);
+    }
+    
+    /* 좌측 메뉴 */
+    .side-menu {
+        width: 25%;
+        padding-right: 30px;
+    }
+    
+    .side-menu-title {
+        font-size: 1.3rem;
+        color: var(--white);
+        background-color: var(--primary-color);
+        padding: 15px;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .side-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid var(--border-color);
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
+    }
+    
+    .side-menu li {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .side-menu li:last-child {
+        border-bottom: none;
+    }
+    
+    .side-menu li a {
+        display: block;
+        padding: 12px 15px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .side-menu li a:hover, .side-menu li.active a {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+    
+    .side-menu li.active a {
+        font-weight: 500;
+        padding-left: 20px;
+    }
+    
+    /* 주요 콘텐츠 영역 */
+    .main-content {
+        width: 75%;
+    }
+    
+    /* 폼 스타일 */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    
+    .form-group input[type="text"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-family: 'Noto Sans KR', sans-serif;
+        font-size: 0.95rem;
+    }
+    
+    .form-group textarea {
+        height: 150px;
+        resize: vertical;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        padding: 30px;
+        border: 2px dashed var(--border-color);
+        border-radius: 4px;
+        text-align: center;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+        background-color: var(--light-gray);
+    }
+    
+    .file-upload-wrapper:hover {
+        border-color: var(--primary-light);
+    }
+    
+    .file-upload-wrapper input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .file-upload-info {
+        color: var(--text-light);
+    }
+    
+    .file-upload-info i {
+        font-size: 2rem;
+        color: var(--primary-light);
+        margin-bottom: 10px;
+    }
+    
+    .file-upload-info p {
+        margin: 5px 0;
+    }
+    
+    .file-upload-info .small {
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+    
+    .image-preview {
+        margin-top: 15px;
+        text-align: center;
+    }
+    
+    .image-preview img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    /* 버튼 스타일 */
+    .form-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .submit-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+    }
+    
+    .submit-btn:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .cancel-btn {
+        background-color: var(--light-gray);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        padding: 10px 25px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .cancel-btn:hover {
+        background-color: var(--border-color);
+    }
+    
+    /* 경고 메시지 */
+    .alert-messages {
+        margin-bottom: 20px;
+    }
+    
+    .alert {
+        padding: 10px 15px;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('갤러리 업로드 페이지가 로드되었습니다.');
+    
+    // 이미지 미리보기 기능
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('image-preview');
+    
+    imageInput.addEventListener('change', function() {
+        imagePreview.innerHTML = '';
+        
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            
+            // 파일 크기 검사 (5MB 제한)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                alert('파일 크기가 너무 큽니다. 5MB 이하의 파일을 선택해주세요.');
+                this.value = '';
+                return;
+            }
+            
+            // 이미지 타입 검사
+            if (!file.type.match('image.*')) {
+                alert('이미지 파일만 업로드할 수 있습니다.');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = '이미지 미리보기';
+                imagePreview.appendChild(img);
+            }
+            
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // 폼 제출 전 유효성 검사
+    const uploadForm = document.getElementById('upload-form');
+    
+    uploadForm.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const image = document.getElementById('image').value;
+        
+        if (!title) {
+            e.preventDefault();
+            alert('제목을 입력해주세요.');
+            return;
+        }
+        
+        if (!image) {
+            e.preventDefault();
+            alert('이미지 파일을 선택해주세요.');
+            return;
+        }
+    });
+});
+</script>
+{% endblock %} 
